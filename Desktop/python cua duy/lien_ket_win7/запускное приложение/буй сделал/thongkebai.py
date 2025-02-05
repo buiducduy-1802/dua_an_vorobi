@@ -17,7 +17,7 @@ if getattr(sys, 'frozen', False):  # Kiểm tra nếu đang chạy từ file .ex
 else:
     current_folder = os.path.dirname(os.path.abspath(__file__))  # Thư mục của file .py
 
-# Trỏ đến thư mục chứa file Excel
+# Trỏ đến thư mục chứa file Excelvd df
 excel_folder = current_folder
 def create_excel_buttons():
     
