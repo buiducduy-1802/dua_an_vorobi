@@ -17,7 +17,7 @@ if getattr(sys, 'frozen', False):  # Kiểm tra nếu đang chạy từ file .ex
 else:
     current_folder = os.path.dirname(os.path.abspath(__file__))  # Thư mục của file .py
 
-# Trỏ đến thư mục chứa file Excelvd df
+# Trỏ đến thư mục chứa file Excelvd dfr2ef
 excel_folder = current_folder
 def create_excel_buttons():
     
@@ -245,15 +245,6 @@ def show_row_data(row_num):
             so_dan_moi_nguoi=tk.Label(dan_duoc,text="количество боеприпасов")
             so_dan_moi_nguoi.grid(row=1, column=2, sticky="e", padx=5, pady=5)
             entry_list_1 = []
-            def update_sum():
-                total = 0
-                for entry in entry_list_1:
-                    try:
-                        ammo_per_person = int(row_data[2])
-                        total = total+ float(entry.get())*ammo_per_person if entry.get() else 0
-                    except ValueError:
-                        pass
-                total_label.config(text=f"общее количество: {total}")
             row_indices = [row_num_d for row_num_d in range(1, sheet.max_row + 1) if sheet.cell(row=row_num_d, column=10).value is not None]
 
             for index, row_num_d in enumerate(row_indices, start=1):
@@ -265,16 +256,32 @@ def show_row_data(row_num):
                     width=20
                 )
                 btn_1.grid(row=index+1, column=1, sticky="e", padx=5, pady=5)
-                
-                    # Entry để nhập số
-                entry_1 = tk.Entry(dan_duoc, width=10)
-                entry_1.grid(row=index+1, column=2, padx=5, pady=5)
-                entry_1.bind("<KeyRelease>", lambda _: update_sum())
-                
+
+                # Thay thế Entry cũ: Duyệt từ cột 11 trở đi và tạo Entry tương ứng
+            ama=9 + len(row_indices)+1
+            for col_num_2 in range(10,  ama, 1):  # Bắt đầu từ cột 11
+                cell_value = sheet.cell(row=row_num, column=col_num_2 + 1).value
+                button_text_1 = float(cell_value) if isinstance(cell_value, (int, float)) else 0
+                entry = tk.Entry(dan_duoc, width=10)
+                entry.grid(row=col_num_2-8, column=2, padx=5, pady=5) 
+                entry.insert(0, int(button_text_1))  # Điền giá trị từ Excel vào Entry
+                entries.append(entry)
+
+                    # Điều chỉnh vị trí cột cho đúng
+                    # entry.insert(0, row_data[col] if row_data[col] is not None else "")
                 # Lưu Entry vào danh sách để tính tổng
-                entry_list_1.append(entry_1)
+                entry_list_1.append(entry)
             total_label = tk.Label(dan_duoc, text="общее количество: 0", font=("Arial", 12, "bold"))
             total_label.grid(row=len(row_indices) + 2, column=1, columnspan=2, pady=10)
+            total = 0
+            for entry in entry_list_1:
+                try:
+                    ammo_per_person = int(row_data[2])
+                    total = total+ float(entry.get())*ammo_per_person if entry.get() else 0
+                except ValueError:
+                    pass
+            total_label.config(text=f"общее количество: {total}")
+
             them_dan=tk.Frame(root,bg='darkgreen')
             them_dan.pack(pady=5)
             def show_entry():
@@ -286,6 +293,10 @@ def show_row_data(row_num):
 
                 # Ẩn nút "Thêm dữ liệu"
                 add_button.pack_forget()
+                        # Tạo nút "Thêm dữ liệu"
+            add_button = tk.Button(row_data_frame, text="Больше данных", command=show_entry)
+            add_button.place(x=760,y=30)
+
             def add_data_to_excel():
                 # Lấy dữ liệu từ entry widget
                 data = entry.get()
@@ -320,9 +331,6 @@ def show_row_data(row_num):
 
                 # Hiện lại nút "Thêm dữ liệu"
                 add_button.pack(pady=10)
-            # Tạo nút "Thêm dữ liệu"
-            add_button = tk.Button(row_data_frame, text="Больше данных", command=show_entry)
-            add_button.place(x=760,y=30)
 
             # Tạo widget nhập dữ liệu (sẽ ẩn ban đầu)
 
